@@ -1,6 +1,7 @@
-from fastapi import FastAPI
-from sqlmodel import SQLModel, Field, Relationship
+from fastapi import FastAPI, Depends, HTTPException, Query
+from sqlmodel import SQLModel, Field, Relationship, Session, create_engine, select
 from uuid import UUID, uuid4
+from typing import Annotated
 
 
 class User(SQLModel, table=True):
@@ -32,17 +33,43 @@ class UserHobbyLink(UserHobbyBase, table=True):
     hobby: Hobby = Relationship()
 
 
+engine = create_engine("sqlite:///hobby-explorer.db", echo=True)
+
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+
+def get_session():
+    with Session(engine) as session:
+        yield session
+
+
+SessionDep = Annotated[Session, Depends(get_session)]
+
+
 app = FastAPI()
 
 
+@app.on_event("startup")
+def on_startup():
+    create_db_and_tables()
+
+
 @app.post("/users")
-def create_user(user: User):
+def create_user(user: User, session: SessionDep):
+    session.add(user)
+    session.commit()
+    session.refresh(user)
     return {"user": user, "message": "User created (placeholder)"}
 
 
 @app.get("/users/{user_id}")
-def get_user(user_id: UUID):
-    return {"user_id": user_id, "message": "Get user (placeholder)"}
+def get_user(user_id: UUID, session: SessionDep):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"user": user, "message": "Get user (placeholder)"}
 
 
 @app.put("/users/{user_id}")
@@ -51,13 +78,19 @@ def update_user(user_id: UUID, user: User):
 
 
 @app.delete("/users/{user_id}")
-def delete_user(user_id: UUID):
-    return {"user_id": user_id, "message": "Delete user (placeholder)"}
+def delete_user(session: SessionDep, user_id: UUID):
+    user = session.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    session.delete(user)
+    session.commit()
+    return {"user_id": user_id, "message": "Deleted user (placeholder)"}
 
 
 @app.get("/users/{user_id}/hobbies")
-def get_user_hobbies(user_id: UUID):
-    return {"user_id": user_id, "hobbies": [], "message": "Get user hobbies (placeholder)"}
+def get_user_hobbies(session: SessionDep, user_id: UUID, offset: int = 0, limit: Annotated[int, Query(le=100)] = 10):
+    hobbies = session.exec(select(Hobby).offset(offset).limit(limit)).all()
+    return {"user_id": user_id, "hobbies": hobbies, "message": "Get user hobbies (placeholder)"}
 
 
 @app.post("/users/{user_id}/hobbies")
