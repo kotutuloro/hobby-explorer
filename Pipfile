@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-fastapi = {extras = ["standard"], version = "*"}
-sqlmodel = "*"
+fastapi = {extras = ["standard"], version = "~=0.115"}
+sqlmodel = "==0.0.24"
 
 [dev-packages]
 pylint = "*"
