@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI
 
 from .models import *
 from .database import create_db_and_tables

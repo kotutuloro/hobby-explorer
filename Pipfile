@@ -9,6 +9,7 @@ sqlmodel = "==0.0.24"
 
 [dev-packages]
 pylint = "*"
+pytest = "~=8.4"
 
 [requires]
 python_version = "3.13"
