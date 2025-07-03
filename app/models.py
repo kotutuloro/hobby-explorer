@@ -40,7 +40,7 @@ class UserUpdate(UserBase):
 
 class HobbyBase(SQLModel):
     """Shared Hobby props"""
-    name: str
+    name: str = Field(index=True)
     description: str | None = None
 
 
