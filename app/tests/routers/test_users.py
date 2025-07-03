@@ -51,7 +51,7 @@ def test_create_user_existing_username(client: TestClient, session: Session):
     }
     resp = client.post("/users", json=user_json)
     assert resp.status_code == 400
-    assert resp.json() == {'detail': 'User already exists'}
+    assert resp.json() == {'detail': 'This username is already taken.'}
 
 
 def test_create_user_existing_email(client: TestClient, session: Session):
@@ -68,7 +68,21 @@ def test_create_user_existing_email(client: TestClient, session: Session):
     }
     resp = client.post("/users", json=user_json)
     assert resp.status_code == 400
-    assert resp.json() == {'detail': 'User already exists'}
+    assert resp.json() == {'detail': 'A user with this email already exists.'}
+
+
+def test_create_user_existing_empty_email(client: TestClient, session: Session):
+    user = User(username="beeyou", name="kiko", password_hash="ultrasecure")
+    session.add(user)
+    session.commit()
+
+    user_json = {
+        "username": "mememe",
+        "name": "new guy",
+        "password": "mycoolpassword",
+    }
+    resp = client.post("/users", json=user_json)
+    assert resp.status_code == 200
 
 
 def test_get_user(client: TestClient, session: Session):
@@ -107,7 +121,7 @@ def test_update_user(client: TestClient, session: Session):
     assert resp.status_code == 200
 
     data = resp.json()
-    assert data["id"] == user.id
+    assert data["id"] == str(user.id)
     assert data["username"] == user_json["username"]
     assert data["email"] == user_json["email"]
     assert data["name"] == user.name

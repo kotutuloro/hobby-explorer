@@ -31,7 +31,9 @@ class UserCreate(UserBase):
 
 class UserUpdate(UserBase):
     """Props to receive on User update"""
-    pass
+    username: str | None = None  # type: ignore
+    name: str | None = None  # type: ignore
+    password: str | None = Field(default=None, min_length=8, max_length=40)
 
 
 # Hobby models
