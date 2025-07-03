@@ -89,7 +89,7 @@ class UserHobbyPublic(UserHobbyBase):
 
 class UserHobbyCreate(UserHobbyBase):
     """Props to receive on UserHobby creation"""
-    pass
+    hobby_id: UUID
 
 
 class UserHobbyUpdate(UserHobbyBase):

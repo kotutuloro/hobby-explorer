@@ -146,7 +146,8 @@ def test_update_user_hobby(client: TestClient, session: Session):
     session.commit()
 
     update_json = {"interested": False, "rating": 2}
-    resp = client.put(f"/users/{user.id}/hobbies/{hobby.id}", json=update_json)
+    resp = client.patch(
+        f"/users/{user.id}/hobbies/{hobby.id}", json=update_json)
     assert resp.status_code == 200
 
     data = resp.json()
@@ -168,7 +169,8 @@ def test_update_user_hobby_not_found(client: TestClient, session: Session):
     session.commit()
 
     update_json = {"interested": False, "rating": 2}
-    resp = client.put(f"/users/{user.id}/hobbies/{hobby.id}", json=update_json)
+    resp = client.patch(
+        f"/users/{user.id}/hobbies/{hobby.id}", json=update_json)
     assert resp.status_code == 404
     assert resp.json() == {"detail": "User hobby link not found"}
 
