@@ -1,0 +1,10 @@
+services:
+  server:
+    build: .
+    volumes:
+      - ./:/backend/
+    command: ["fastapi", "dev", "app/main.py", "--host", "0.0.0.0"]
+    env_file:
+      - .env
+    ports:
+      - 8000:8000
