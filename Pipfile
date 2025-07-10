@@ -4,8 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
+fastapi = {extras = ["standard"], version = "~=0.115"}
+sqlmodel = "==0.0.24"
 
 [dev-packages]
+pylint = "*"
+pytest = "~=8.4"
 
 [requires]
 python_version = "3.13"
