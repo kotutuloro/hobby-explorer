@@ -1,8 +1,8 @@
 from sqlmodel import SQLModel, Session, create_engine
 
-connect_args = {"check_same_thread": False}
-engine = create_engine("sqlite:///hobby-explorer.db",
-                       echo=True, connect_args=connect_args)
+from .config import settings
+
+engine = create_engine(str(settings.DATABASE_URL))
 
 
 def create_db_and_tables():
