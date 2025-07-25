@@ -5,8 +5,6 @@ WIP
 ### Todos:
 
 - Postgres
-  - set up pg db
-  - set up pg testing db
   - set up alembic migrations?
   - find data to populate db
 - Dockerize

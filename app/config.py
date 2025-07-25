@@ -10,7 +10,8 @@ class Settings(BaseSettings):
     POSTGRES_PASSWORD: str
     POSTGRES_SERVER: str = "db"
     POSTGRES_PORT: int = 5432
-    POSTGRES_DB: str = ""
+    POSTGRES_DB: str
+    POSTGRES_TEST_DB: str = ""
 
     # SQLALCHEMY_DATABASE_URI
     @computed_field  # type: ignore[prop-decorator]
@@ -23,6 +24,18 @@ class Settings(BaseSettings):
             host=self.POSTGRES_SERVER,
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB,
+        )
+
+    @computed_field  # type: ignore[prop-decorator]
+    @property
+    def TEST_DATABASE_URL(self) -> PostgresDsn:
+        return PostgresDsn.build(
+            scheme="postgresql",
+            username=self.POSTGRES_USER,
+            password=self.POSTGRES_PASSWORD,
+            host=self.POSTGRES_SERVER,
+            port=self.POSTGRES_PORT,
+            path=self.POSTGRES_TEST_DB,
         )
 
 

@@ -1,31 +1,27 @@
 import pytest
 from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
-from sqlmodel.pool import StaticPool
 from sqlalchemy.engine import Engine
 from typing import Generator
 
 from app.database import get_session
 from app.main import app
+from app.config import settings
 
 
-@pytest.fixture()
+@pytest.fixture
 def engine() -> Engine:
-    connect_args = {"check_same_thread": False}
-    engine = create_engine(
-        "sqlite://", connect_args=connect_args, poolclass=StaticPool)
-    SQLModel.metadata.create_all(engine)
+    engine = create_engine(f"{settings.TEST_DATABASE_URL}", echo=True)
     return engine
 
 
-# @pytest.fixture(autouse=True)
-# def cleanup(engine: Engine) -> Generator[None, None, None]:
-#     SQLModel.metadata.create_all(engine)
-#     yield
-#     SQLModel.metadata.drop_all(engine)
+@pytest.fixture(autouse=True)
+def cleanup(engine: Engine):
+    SQLModel.metadata.drop_all(engine)
+    SQLModel.metadata.create_all(engine)
 
 
-@pytest.fixture()
+@pytest.fixture
 def session(engine: Engine) -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session
