@@ -9,6 +9,15 @@ services:
     ports:
       - 8000:8000
     depends_on:
+      migrations:
+        condition: service_completed_successfully
+
+  migrations:
+    build: .
+    volumes:
+      - ./:/backend/
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
       - db
 
   db:
