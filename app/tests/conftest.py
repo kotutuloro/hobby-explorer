@@ -3,6 +3,8 @@ from fastapi.testclient import TestClient
 from sqlmodel import Session, SQLModel, create_engine
 from sqlalchemy.engine import Engine
 from typing import Generator
+import alembic
+from alembic.config import Config as AlembicConfig
 
 from app.database import get_session
 from app.main import app
@@ -16,9 +18,12 @@ def engine() -> Engine:
 
 
 @pytest.fixture(autouse=True)
-def cleanup(engine: Engine):
-    SQLModel.metadata.drop_all(engine)
-    SQLModel.metadata.create_all(engine)
+def apply_migrations(engine: Engine):
+    alembic_cfg = AlembicConfig("alembic.ini")
+    alembic_cfg.attributes["connection"] = engine
+    alembic.command.upgrade(alembic_cfg, "head")
+    yield
+    alembic.command.downgrade(alembic_cfg, "base")
 
 
 @pytest.fixture

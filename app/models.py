@@ -101,3 +101,7 @@ class UserHobbyCreate(UserHobbyBase):
 class UserHobbyUpdate(UserHobbyBase):
     """Props to receive on UserHobby update"""
     pass
+
+
+def get_metadata():
+    return SQLModel.metadata
