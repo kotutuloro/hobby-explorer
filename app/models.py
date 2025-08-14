@@ -80,8 +80,10 @@ class UserHobbyLink(UserHobbyBase, table=True):
     """DB model for userhobbylink table"""
     __tablename__ = "user_hobbies"
 
-    user_id: UUID = Field(foreign_key="users.id", primary_key=True)
-    hobby_id: UUID = Field(foreign_key="hobbies.id", primary_key=True)
+    user_id: UUID = Field(foreign_key="users.id",
+                          primary_key=True, ondelete="CASCADE")
+    hobby_id: UUID = Field(foreign_key="hobbies.id",
+                           primary_key=True, ondelete="CASCADE")
 
     user: User = Relationship(back_populates="hobby_links")
     hobby: Hobby = Relationship()
