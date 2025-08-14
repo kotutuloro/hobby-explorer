@@ -6,9 +6,9 @@ from typing import Generator
 import alembic
 from alembic.config import Config as AlembicConfig
 
-from app.database import get_session
+from app.db.database import get_session
 from app.main import app
-from app.config import settings
+from app.core.config import settings
 
 
 @pytest.fixture
