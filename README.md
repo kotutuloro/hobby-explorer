@@ -2,6 +2,10 @@
 
 WIP
 
+### Helpful commands
+
+- `docker-compose run migrations alembic downgrade <revision-id>`
+
 ### Todos:
 
 - Postgres
