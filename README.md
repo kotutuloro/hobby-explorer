@@ -2,14 +2,12 @@
 
 WIP
 
+### Helpful commands
+
+- `docker-compose run migrations alembic downgrade <revision-id>`
+
 ### Todos:
 
-- Postgres
-  - set up pg db
-  - set up pg testing db
-  - set up alembic migrations?
-  - find data to populate db
-- Dockerize
 - ML Suggestion Service
 - Abstract db actions out from routers
 - User authentication

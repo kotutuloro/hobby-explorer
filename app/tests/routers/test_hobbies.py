@@ -32,6 +32,15 @@ def test_create_hobby_incomplete(client: TestClient):
     assert resp.status_code == 422
 
 
+def test_create_hobby_empty_name(client: TestClient):
+    hobby_json = {
+        "name": "",
+        "description": "Missing name"
+    }
+    resp = client.post("/hobbies", json=hobby_json)
+    assert resp.status_code == 422
+
+
 def test_create_hobby_existing_name(client: TestClient, session: Session):
     hobby = Hobby(name="Origami", description="Paper folding art")
     session.add(hobby)

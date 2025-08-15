@@ -1,0 +1,3 @@
+#! /bin/sh
+
+docker-compose up --no-recreate -d db && docker-compose exec db psql -U postgres hobby-explorer

@@ -1,31 +1,32 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
-from sqlmodel.pool import StaticPool
+from sqlmodel import Session, create_engine
 from sqlalchemy.engine import Engine
 from typing import Generator
+import alembic
+from alembic.config import Config as AlembicConfig
 
-from app.database import get_session
+from app.db.database import get_session
 from app.main import app
+from app.core.config import settings
 
 
-@pytest.fixture()
+@pytest.fixture
 def engine() -> Engine:
-    connect_args = {"check_same_thread": False}
-    engine = create_engine(
-        "sqlite://", connect_args=connect_args, poolclass=StaticPool)
-    SQLModel.metadata.create_all(engine)
+    engine = create_engine(f"{settings.TEST_DATABASE_URL}")
     return engine
 
 
-# @pytest.fixture(autouse=True)
-# def cleanup(engine: Engine) -> Generator[None, None, None]:
-#     SQLModel.metadata.create_all(engine)
-#     yield
-#     SQLModel.metadata.drop_all(engine)
+@pytest.fixture(autouse=True)
+def apply_migrations(engine: Engine):
+    alembic_cfg = AlembicConfig("alembic.ini")
+    alembic_cfg.attributes["connection"] = engine
+    alembic.command.upgrade(alembic_cfg, "head")
+    yield
+    alembic.command.downgrade(alembic_cfg, "base")
 
 
-@pytest.fixture()
+@pytest.fixture
 def session(engine: Engine) -> Generator[Session, None, None]:
     with Session(engine) as session:
         yield session

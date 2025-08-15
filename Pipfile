@@ -6,6 +6,9 @@ name = "pypi"
 [packages]
 fastapi = {extras = ["standard"], version = "~=0.115"}
 sqlmodel = "==0.0.24"
+pydantic-settings = "~=2.10"
+psycopg2-binary = "~=2.9"
+alembic = "~=1.16"
 
 [dev-packages]
 pylint = "*"

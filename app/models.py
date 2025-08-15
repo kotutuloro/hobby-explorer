@@ -13,6 +13,8 @@ class UserBase(SQLModel):
 
 class User(UserBase, table=True):
     """DB model for user table"""
+    __tablename__ = "users"
+
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     password_hash: str
 
@@ -40,12 +42,14 @@ class UserUpdate(UserBase):
 
 class HobbyBase(SQLModel):
     """Shared Hobby props"""
-    name: str = Field(index=True)
+    name: str = Field(index=True, unique=True, min_length=2)
     description: str | None = None
 
 
 class Hobby(HobbyBase, table=True):
     """DB model for hobby table"""
+    __tablename__ = "hobbies"
+
     id: UUID = Field(default_factory=uuid4, primary_key=True)
 
 
@@ -74,8 +78,12 @@ class UserHobbyBase(SQLModel):
 
 class UserHobbyLink(UserHobbyBase, table=True):
     """DB model for userhobbylink table"""
-    user_id: UUID = Field(foreign_key="user.id", primary_key=True)
-    hobby_id: UUID = Field(foreign_key="hobby.id", primary_key=True)
+    __tablename__ = "user_hobbies"
+
+    user_id: UUID = Field(foreign_key="users.id",
+                          primary_key=True, ondelete="CASCADE")
+    hobby_id: UUID = Field(foreign_key="hobbies.id",
+                           primary_key=True, ondelete="CASCADE")
 
     user: User = Relationship(back_populates="hobby_links")
     hobby: Hobby = Relationship()
@@ -95,3 +103,7 @@ class UserHobbyCreate(UserHobbyBase):
 class UserHobbyUpdate(UserHobbyBase):
     """Props to receive on UserHobby update"""
     pass
+
+
+def get_metadata():
+    return SQLModel.metadata
