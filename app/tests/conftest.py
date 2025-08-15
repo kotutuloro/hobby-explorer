@@ -13,7 +13,7 @@ from app.core.config import settings
 
 @pytest.fixture
 def engine() -> Engine:
-    engine = create_engine(f"{settings.TEST_DATABASE_URL}", echo=True)
+    engine = create_engine(f"{settings.TEST_DATABASE_URL}")
     return engine
 
 
