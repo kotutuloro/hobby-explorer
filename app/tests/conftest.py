@@ -1,6 +1,6 @@
 import pytest
 from fastapi.testclient import TestClient
-from sqlmodel import Session, SQLModel, create_engine
+from sqlmodel import Session, create_engine
 from sqlalchemy.engine import Engine
 from typing import Generator
 import alembic
