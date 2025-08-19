@@ -1,8 +1,9 @@
 from fastapi import APIRouter, HTTPException
-from sqlmodel import select
+from uuid import UUID
 
 from app.dependencies import SessionDep
-from app.models import *
+from app.models import UserPublic, UserCreate, UserUpdate
+from app import crud
 
 
 router = APIRouter()
@@ -10,33 +11,26 @@ router = APIRouter()
 
 @router.post("/users", response_model=UserPublic)
 def create_user(session: SessionDep, user_in: UserCreate):
-    existing_user = session.exec(select(User).where(
-        User.username == user_in.username)).first()
+    existing_user = crud.get_user_by_username(session, user_in.username)
     if existing_user:
         raise HTTPException(
             status_code=400,
             detail="This username is already taken.")
 
     if user_in.email:
-        existing_user = session.exec(select(User).where(
-            User.email == user_in.email)).first()
+        existing_user = crud.get_user_by_email(session, user_in.email)
         if existing_user:
             raise HTTPException(
                 status_code=400,
                 detail="A user with this email already exists.")
 
-    # TODO: password hashing
-    db_user = User.model_validate(
-        user_in, update={"password_hash": user_in.password})
-    session.add(db_user)
-    session.commit()
-    session.refresh(db_user)
-    return db_user
+    user = crud.create_user(session, user_in)
+    return user
 
 
 @router.get("/users/{user_id}", response_model=UserPublic)
 def get_user(session: SessionDep, user_id: UUID):
-    user = session.get(User, user_id)
+    user = crud.get_user_by_uuid(session, user_id)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
@@ -44,25 +38,18 @@ def get_user(session: SessionDep, user_id: UUID):
 
 @router.patch("/users/{user_id}", response_model=UserPublic)
 def update_user(session: SessionDep, user_id: UUID, user_in: UserUpdate):
-    db_user = get_user(session, user_id)
+    db_user = crud.get_user_by_uuid(session, user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
 
-    user_data = user_in.model_dump(exclude_unset=True)
-    if "password" in user_data:
-        # TODO: password hashing
-        password_hash = user_data["password"]
-        user_data["password_hash"] = password_hash
-
-    db_user.sqlmodel_update(user_data)
-    session.add(db_user)
-    session.commit()
-    session.refresh(db_user)
+    db_user = crud.update_user(session, db_user, user_in)
     return db_user
 
 
 @router.delete("/users/{user_id}")
 def delete_user(session: SessionDep, user_id: UUID):
-    user = get_user(session, user_id)
-
-    session.delete(user)
-    session.commit()
+    db_user = crud.get_user_by_uuid(session, user_id)
+    if not db_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    crud.delete_user(session, db_user)
     return {"ok": True}

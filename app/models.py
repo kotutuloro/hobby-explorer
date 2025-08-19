@@ -18,7 +18,8 @@ class User(UserBase, table=True):
     id: UUID = Field(default_factory=uuid4, primary_key=True)
     password_hash: str
 
-    hobby_links: list["UserHobbyLink"] = Relationship(back_populates="user")
+    hobby_links: list["UserHobbyLink"] = Relationship(
+        back_populates="user", passive_deletes="all")
 
 
 class UserPublic(UserBase):
