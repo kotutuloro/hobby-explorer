@@ -26,8 +26,7 @@ def test_create_user(client: TestClient, session: Session):
     assert db_user.username == user_json["username"]
     assert db_user.name == user_json["name"]
     assert db_user.email is None
-    # TODO: Check password hash is hashed
-    assert db_user.password_hash == user_json["password"]
+    assert db_user.password_hash != user_json["password"]
 
 
 def test_create_user_incomplete(client: TestClient):
@@ -133,8 +132,7 @@ def test_update_user(client: TestClient, session: Session):
     assert db_user.username == user_json["username"]
     assert db_user.name == user.name
     assert db_user.email == user_json["email"]
-    # TODO: Check password hash is hashed
-    assert db_user.password_hash == user_json["password"]
+    assert db_user.password_hash != user_json["password"]
 
 
 def test_update_user_not_found(client: TestClient):

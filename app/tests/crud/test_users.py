@@ -1,3 +1,4 @@
+import bcrypt
 import pytest
 from sqlalchemy.exc import IntegrityError
 from sqlmodel import Session
@@ -16,8 +17,10 @@ def test_create_user_success(session: Session):
     assert user.username == user_in.username
     assert user.name == user_in.name
     assert user.email == user_in.email
-    # TODO: When hashing is implemented, update this assertion
-    assert user.password_hash == user_in.password
+    assert bcrypt.checkpw(
+        user_in.password.encode('utf-8'),
+        user.password_hash.encode('utf-8')
+    )
 
 
 def test_create_user_duplicate_username_raises(session: Session):
@@ -83,8 +86,10 @@ def test_update_user_changes_fields(session: Session):
     assert updated.username == "newuser"
     assert updated.name == "Old Name"
     assert updated.email is None
-    # TODO: When hashing is implemented, update this assertion
-    assert updated.password_hash == "newpassword"
+    assert bcrypt.checkpw(
+        "newpassword".encode('utf-8'),
+        user.password_hash.encode('utf-8')
+    )
 
 
 def test_update_user_duplicate_username_raises(session: Session):
