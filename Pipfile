@@ -10,10 +10,13 @@ pydantic-settings = "~=2.10"
 psycopg2-binary = "~=2.9"
 alembic = "~=1.16"
 bcrypt = "~=4.3.0"
+pandas = "~=2.3.2"
+scikit-learn = "~=1.7.1"
 
 [dev-packages]
 pylint = "*"
 pytest = "~=8.4"
+pandas-stubs = "*"
 
 [requires]
 python_version = "3.13"
