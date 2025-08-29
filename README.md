@@ -16,6 +16,11 @@ A hobby recommender service and API
 ### Todos:
 
 - ML Suggestion Service
+  - handle key errors
+  - use content-based recommendation system when there's not enough user data
+  - use the hobby.interested column in similarity analysis
+  - save and load analysis to/from feather files
+  - cron job recreates analysis from sql every hour?
 - User authentication
 - Front-end
 -
