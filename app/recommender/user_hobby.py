@@ -57,6 +57,10 @@ class _UserHobbyRecommender():
         return top_hobbies.index.to_list()
 
     def get_similar_hobbies(self, hobby_id: UUID, num_recs: int = 2) -> list[UUID]:
+        if self._hobby_similarity_df is None:
+            raise AttributeError(
+                f"Missing required dataframe attributes. Refresh data with `load_from_feather` or `load_from_sql`.")
+
         similars = self._hobby_similarity_df[hobby_id]
         top_hobbies = similars[similars > 0].nlargest(num_recs+1)[1:]
         return top_hobbies.index.to_list()
@@ -85,6 +89,7 @@ class _UserHobbyRecommender():
         content = []
         for _ in range(100):
             size = int(rng.integers(1, 20))
+            size = min(size, len(hobby_id_series))
             hobby_ids = hobby_id_series.sample(
                 size, random_state=rng, ignore_index=True)
             interested = rng.random(size) > 0.5
