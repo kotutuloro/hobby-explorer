@@ -8,6 +8,7 @@ class UserHobbyBase(SQLModel):
     """Shared UserHobby props"""
     interested: bool = True
     rating: int | None = None
+    # todo: rating defaults to 0, user choice from 1-5
 
 
 class UserHobbyLink(UserHobbyBase, table=True):
