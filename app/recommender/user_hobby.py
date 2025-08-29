@@ -1,4 +1,3 @@
-from typing import Self
 from uuid import UUID, uuid4
 import pandas as pd
 import numpy as np
@@ -32,7 +31,7 @@ class _UserHobbyRecommender():
     def dump_to_feather(self):
         pass
 
-    def get_hobby_recommendations_for_user(
+    def get_hobby_recs_for_user(
         self,
         user_id: UUID,
         num_recs: int = 2,
@@ -44,6 +43,7 @@ class _UserHobbyRecommender():
                 f"Missing required dataframe attributes. Refresh data with `load_from_feather` or `load_from_sql`.")
 
         recs = pd.Series(dtype=float)
+        # todo: try/catch for user_id name errors
         # todo: load current user ratings from db instead?
         user_ratings = self._user_hobby_matrix.loc[user_id]
         similars = self._user_similarity_df[user_id].sort_values(

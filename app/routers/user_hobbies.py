@@ -5,6 +5,7 @@ from uuid import UUID
 from app.dependencies import SessionDep
 from app.models import UserHobbyPublic, UserHobbyCreate, UserHobbyUpdate, HobbyPublic
 from app import crud
+from app.recommender import user_hobby_recommender
 
 
 router = APIRouter()
@@ -75,6 +76,11 @@ def delete_user_hobby(session: SessionDep, user_id: UUID, hobby_id: UUID):
     return {"ok": True}
 
 
-@router.get("/users/{user_id}/hobbies/suggestions")
-def get_hobby_suggestions(user_id: UUID):
-    return {"user_id": user_id, "suggestions": [], "message": "Hobby suggestions (placeholder)"}
+@router.get("/users/{user_id}/suggestions/hobbies", response_model=list[HobbyPublic])
+def get_hobby_suggestions(session: SessionDep, user_id: UUID, limit: Annotated[int, Query(le=10)] = 10):
+    if not crud.get_user_by_uuid(session, user_id):
+        raise HTTPException(status_code=404, detail="User not found")
+    hobby_ids = user_hobby_recommender.get_hobby_recs_for_user(user_id, limit)
+    recs = [crud.get_hobby_by_uuid(session, hobby_id)
+            for hobby_id in hobby_ids]
+    return [hobby for hobby in recs if hobby is not None]
