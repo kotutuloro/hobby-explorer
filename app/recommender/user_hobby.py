@@ -8,32 +8,28 @@ from sqlalchemy.engine import Connectable
 from app.models import Hobby, UserHobbyLink
 
 
-class UserHobbyRecommender():
+class _UserHobbyRecommender():
     def __init__(self,):
         self._user_hobby_matrix = None
         self._user_similarity_df = None
         self._hobby_similarity_df = None
 
-    @classmethod
-    def from_sql(cls, db_conn: Connectable, include_dummy: bool = True) -> Self:
+    def load_from_sql(self, db_conn: Connectable, include_dummy: bool = True):
         user_hobby_df = pd.read_sql_table(
             UserHobbyLink.__tablename__, db_conn)
 
         if include_dummy and len(user_hobby_df) < 50:
             hobby_df = pd.read_sql_table(Hobby.__tablename__, db_conn)
-            init_data = cls._dummy_user_hobby_data(hobby_df.id)
+            init_data = self._dummy_user_hobby_data(hobby_df.id)
             user_hobby_df = pd.concat(
                 [init_data, user_hobby_df], ignore_index=True)
 
-        recommender = cls()
-        recommender._analyze_ratings(user_hobby_df)
-        return recommender
+        self._analyze_ratings(user_hobby_df)
 
-    @classmethod
-    def from_feather(cls):
+    def load_from_feather(self):
         pass
 
-    def to_feather(self):
+    def dump_to_feather(self):
         pass
 
     def get_hobby_recommendations_for_user(
@@ -44,7 +40,8 @@ class UserHobbyRecommender():
     ) -> list[UUID]:
 
         if self._user_hobby_matrix is None or self._user_similarity_df is None:
-            raise AttributeError(f"Missing required dataframe attributes.")
+            raise AttributeError(
+                f"Missing required dataframe attributes. Refresh data with `load_from_feather` or `load_from_sql`.")
 
         recs = pd.Series(dtype=float)
         # todo: load current user ratings from db instead?
@@ -104,3 +101,6 @@ class UserHobbyRecommender():
             content.append(dummy_data)
 
         return pd.concat(content, ignore_index=True)
+
+
+user_hobby_recommender = _UserHobbyRecommender()
